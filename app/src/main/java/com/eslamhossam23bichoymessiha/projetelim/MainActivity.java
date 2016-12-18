@@ -9,6 +9,8 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -102,6 +104,14 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
 
     }
+    public void updateProgress(int db){
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setProgress(db);
+        progressBar.invalidate();
+        TextView textView = (TextView) findViewById(R.id.textView);
+        textView.setText(String.valueOf(db));
+        textView.invalidate();
+    }
 
     public class SaveAudio extends TimerTask {
         public MediaRecorder mediaRecorder;
@@ -136,7 +146,13 @@ public class MainActivity extends AppCompatActivity {
                     currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
                     String[] time = currentDateTimeString.split(" ");
                     try {
-                        float db = (float) (20.0 * Math.log10(p/ 0.00002));
+                        final float db = (float) (20.0 * Math.log10(p/ 0.00002));
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateProgress((int) db);
+                            }
+                        });
                         if (printWriter != null) {
                             printWriter.println(time[3]);
                             if(location != null){
@@ -202,6 +218,8 @@ public class MainActivity extends AppCompatActivity {
             mediaRecorder.reset();
             mediaRecorder.release();
         }
+
+
     }
 
 
