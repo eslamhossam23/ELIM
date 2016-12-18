@@ -9,17 +9,13 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.TextView;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -32,11 +28,17 @@ public class MainActivity extends AppCompatActivity {
     public static final int DELAY = 1000;
     public static LocationManager locationManager;
     public static Location location;
+    public static SendToServer socket;
+    public static Thread networkThread;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        socket = new SendToServer();
+        networkThread = new Thread(socket);
+        networkThread.start();
         Timer timer = new Timer();
         SaveAudio saveAudio = new SaveAudio();
         timer.schedule(saveAudio, DELAY, PERIOD);
@@ -76,30 +78,10 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public void updateFile(View v){
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/levels.txt");
-        FileWriter fileWriter;
-        String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-
-        try {
-            fileWriter = new FileWriter(file, true);
-            PrintWriter printWriter = new PrintWriter(fileWriter);
-            printWriter.println(currentDateTimeString + " - Noise level = " + level);
-            printWriter.close();
-            fileWriter.close();
-            Log.d("Write", level);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-//        TextView textView = (TextView)findViewById(R.id.textView);
-//        textView.setText(String.valueOf(mediaRecorder.getMaxAmplitude()));
-
 
     }
+
+
 
     public static void setLevel(int levelInt){
         level = String.valueOf(levelInt);
@@ -108,6 +90,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         saveAudio.stopRecording();
+        networkThread.interrupt();
+            try {
+                socket.getSocket().close();
+                Log.i("Socket", "Socket closed successfully.");
+            } catch (IOException e) {
+                String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+                Log.e("Socket", "Couldn't close socket at " + currentDateTimeString);
+//                e.printStackTrace();
+        }
         super.onDestroy();
 
     }
@@ -125,6 +116,10 @@ public class MainActivity extends AppCompatActivity {
             try {
                 fileWriter = new FileWriter(file, true);
                 printWriter = new PrintWriter(fileWriter);
+                while (socket.getSocket() == null){
+
+                }
+                socket.sendToServer("Began recording at " + currentDateTimeString);
                 printWriter.println("Began recording at " + currentDateTimeString);
                 printWriter.println();
                 printWriter.flush();
@@ -145,7 +140,10 @@ public class MainActivity extends AppCompatActivity {
                         if (printWriter != null) {
                             printWriter.println(time[3]);
                             if(location != null){
+                                socket.sendToServer(time[3] + "\n" + "Lat: " + location.getLatitude() + " Long: " + location.getLongitude() + "\n" + "Noise level = " + db);
                                 printWriter.println("Lat: " + location.getLatitude() + " Long: " + location.getLongitude());
+                            }else {
+                                socket.sendToServer(time[3] + "\n" + "Retrieving coordinates..." + "\n" + "Noise level = " + db);
                             }
                             printWriter.println("Noise level = " + db);
                             printWriter.println();
@@ -166,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
             }
             currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             if (printWriter != null) {
+                socket.sendToServer("Stopped recording at " + currentDateTimeString);
                 printWriter.println("Stopped recording at " + currentDateTimeString);
                 printWriter.println();
                 printWriter.flush();
