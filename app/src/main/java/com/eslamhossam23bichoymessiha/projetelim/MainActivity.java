@@ -28,6 +28,10 @@ public class MainActivity extends AppCompatActivity {
     public static final int PERIOD = 10000;
     //Delay before start of first recording
     public static final int DELAY = 1000;
+    //Data separator
+    private static final String SEPARATOR = "-";
+    //Unknown GPS
+    public static final String UNKNOWN = "UNKNOWN";
     public static LocationManager locationManager;
     public static Location location;
     public static SendToServer socket;
@@ -156,10 +160,10 @@ public class MainActivity extends AppCompatActivity {
                         if (printWriter != null) {
                             printWriter.println(time[3]);
                             if(location != null){
-                                socket.sendToServer(time[3] + "\n" + "Lat: " + location.getLatitude() + " Long: " + location.getLongitude() + "\n" + "Noise level = " + db);
+                                socket.sendToServer(time[3] + SEPARATOR + location.getLatitude() + SEPARATOR + location.getLongitude() + SEPARATOR + db);
                                 printWriter.println("Lat: " + location.getLatitude() + " Long: " + location.getLongitude());
                             }else {
-                                socket.sendToServer(time[3] + "\n" + "Retrieving coordinates..." + "\n" + "Noise level = " + db);
+                                socket.sendToServer(time[3] + SEPARATOR + UNKNOWN + SEPARATOR + UNKNOWN + SEPARATOR + db);
                             }
                             printWriter.println("Noise level = " + db);
                             printWriter.println();
