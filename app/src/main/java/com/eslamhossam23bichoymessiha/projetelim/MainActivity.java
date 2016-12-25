@@ -9,6 +9,8 @@ import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -66,8 +68,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 0, locationListener);
+        if (locationManager.getAllProviders().contains(LocationManager.GPS_PROVIDER))
+            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (locationManager.getAllProviders().contains(LocationManager.NETWORK_PROVIDER))
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 0, locationListener);
         File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/levels.txt");
         try {
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
@@ -81,6 +85,14 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        // button to retrieve data from server
+        final Button chartButton = (Button) findViewById(R.id.chartButton);
+        chartButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                socket.sendToServer("send me data please");
+            }
+        });
     }
 
 

@@ -20,7 +20,7 @@ public class SendToServer implements Runnable {
     @Override
     public void run() {
         try {
-            socket = new Socket("192.168.1.55", 3000);
+            socket = new Socket("192.168.0.7", 3000);
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             sendToServer("Started app at " + currentDateTimeString);
         } catch (IOException e) {
