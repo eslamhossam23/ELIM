@@ -14,7 +14,7 @@ import java.util.Date;
 
 public class SendToServer implements Runnable {
 
-    private Socket socket;
+    public static Socket socket;
     private String data;
 
     @Override
