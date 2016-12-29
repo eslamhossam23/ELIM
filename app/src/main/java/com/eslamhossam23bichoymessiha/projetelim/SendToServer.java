@@ -24,13 +24,31 @@ public class SendToServer implements Runnable {
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             sendToServer("Started app at " + currentDateTimeString);
         } catch (IOException e) {
-//                    e.printStackTrace();
+//          e.printStackTrace();
             Log.e("Socket", "Couldn't initialise socket.");
         }
     }
 
     public void sendToServer(final String data){
         final String message = data + "\n";
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    OutputStream outputStream = socket.getOutputStream();
+                    outputStream.write(message.getBytes());
+                } catch (IOException e) {
+                    String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+                    Log.e("Socket", "Couldn't send data. " + message + currentDateTimeString);
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+
+    }
+    public void retrieveDataFromServer(){
+        final String message = "send me data please" + "\n";
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
