@@ -160,10 +160,10 @@ public class MainActivity extends AppCompatActivity {
                         if (printWriter != null) {
                             printWriter.println(time[3]);
                             if(location != null){
-                                socket.sendToServer(time[3] + SEPARATOR + location.getLatitude() + SEPARATOR + location.getLongitude() + SEPARATOR + db);
+                                socket.sendToServer(System.currentTimeMillis() + SEPARATOR + location.getLatitude() + SEPARATOR + location.getLongitude() + SEPARATOR + db);
                                 printWriter.println("Lat: " + location.getLatitude() + " Long: " + location.getLongitude());
                             }else {
-                                socket.sendToServer(time[3] + SEPARATOR + UNKNOWN + SEPARATOR + UNKNOWN + SEPARATOR + db);
+                                socket.sendToServer(System.currentTimeMillis() + SEPARATOR + UNKNOWN + SEPARATOR + UNKNOWN + SEPARATOR + db);
                             }
                             printWriter.println("Noise level = " + db);
                             printWriter.println();
