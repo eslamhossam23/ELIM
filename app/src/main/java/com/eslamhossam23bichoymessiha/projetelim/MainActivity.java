@@ -1,6 +1,7 @@
 package com.eslamhossam23bichoymessiha.projetelim;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -11,15 +12,21 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -38,7 +45,9 @@ public class MainActivity extends AppCompatActivity {
     public static Location location;
     public static SendToServer socket;
     public static Thread networkThread;
-
+    public static Thread recievingThread;
+    public static ReceiveFromServer recievingSocket;
+    public LineChart chart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
         socket = new SendToServer();
         networkThread = new Thread(socket);
         networkThread.start();
+        recievingSocket = new ReceiveFromServer();
+        recievingThread = new Thread(recievingSocket);
         Timer timer = new Timer();
         SaveAudio saveAudio = new SaveAudio();
         timer.schedule(saveAudio, DELAY, PERIOD);
@@ -94,44 +105,45 @@ public class MainActivity extends AppCompatActivity {
         chartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
-                socket.retrieveDataFromServer();
+                socket.askServerForData();
+                DataOfLastDay dataRecieved = socket.getDataRecieved();
+                // Bug: second time the button is pressed, it sends the previous version of data, doesn't wait till the other version is ready.
+                Log.d("object", dataRecieved.toString());
+
+                chart = (LineChart) findViewById(R.id.chart);
+//                LineChart.
+
+                List<Entry> timedBEntries = new ArrayList<Entry>();
+                for (TimedBCouple couple : dataRecieved.getChartTimedB()) {
+                    timedBEntries.add(new Entry(couple.getTime(), couple.getdB()));
+                }
+                LineDataSet dataSet = new LineDataSet(timedBEntries, "Data Of Last Day"); // add entries to dataset
+                dataSet.setColor(Color.BLUE);
+                dataSet.setValueTextColor(Color.BLACK);
+                dataSet.setDrawFilled(true);
+                dataSet.setFillColor(Color.CYAN);
+                dataSet.setFillAlpha(150);
+                dataSet.setDrawCircles(false);
+
+                LineData lineData = new LineData(dataSet);
+                chart.setData(lineData);
+                XAxis xAxis = chart.getXAxis();
+                xAxis.setValueFormatter(new TimeFormatter());
+                chart.invalidate();
             }
         });
+
     }
 
 
-
-    public static void setLevel(int levelInt){
+    public static void setLevel(int levelInt) {
         level = String.valueOf(levelInt);
-    }
-
-    @Override
-    protected void onDestroy() {
-        saveAudio.stopRecording();
-        networkThread.interrupt();
-            try {
-                socket.getSocket().close();
-                Log.i("Socket", "Socket closed successfully.");
-            } catch (IOException e) {
-                String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
-                Log.e("Socket", "Couldn't close socket at " + currentDateTimeString);
-//                e.printStackTrace();
-        }
-        super.onDestroy();
-
-    }
-    public void updateProgress(int db){
-        ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        progressBar.setProgress(db);
-        progressBar.invalidate();
-        TextView textView = (TextView) findViewById(R.id.textView);
-        textView.setText(String.valueOf(db));
-        textView.invalidate();
     }
 
     public class SaveAudio extends TimerTask {
         public MediaRecorder mediaRecorder;
-        public static final int SECONDS = PERIOD/1000;
+        public static final int SECONDS = PERIOD / 1000;
+
         @Override
         public void run() {
             startRecording();
@@ -142,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 fileWriter = new FileWriter(file, true);
                 printWriter = new PrintWriter(fileWriter);
-                while (socket.getSocket() == null){
+                while (socket.getSocket() == null) {
 
                 }
                 socket.sendToServer("Began recording at " + currentDateTimeString);
@@ -153,28 +165,22 @@ public class MainActivity extends AppCompatActivity {
 //                e.printStackTrace();
                 Log.e("Recording", "Failed to start recording at" + currentDateTimeString);
             }
-            for(int i = 0; i < SECONDS; i++){
+            for (int i = 0; i < SECONDS; i++) {
                 int amplitude = mediaRecorder.getMaxAmplitude();
-                float p = (float) (amplitude/51805.5336);
-                if(amplitude > 0){
+                float p = (float) (amplitude / 51805.5336);
+                if (amplitude > 0) {
                     MainActivity.setLevel(amplitude);
                     Log.d("Audio", String.valueOf(amplitude));
                     currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
                     String[] time = currentDateTimeString.split(" ");
                     try {
-                        final float db = (float) (20.0 * Math.log10(p/ 0.00002));
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                updateProgress((int) db);
-                            }
-                        });
+                        final float db = (float) (20.0 * Math.log10(p / 0.00002));
                         if (printWriter != null) {
                             printWriter.println(time[3]);
-                            if(location != null){
+                            if (location != null) {
                                 socket.sendToServer(System.currentTimeMillis() + SEPARATOR + location.getLatitude() + SEPARATOR + location.getLongitude() + SEPARATOR + db);
                                 printWriter.println("Lat: " + location.getLatitude() + " Long: " + location.getLongitude());
-                            }else {
+                            } else {
                                 socket.sendToServer(System.currentTimeMillis() + SEPARATOR + UNKNOWN + SEPARATOR + UNKNOWN + SEPARATOR + db);
                             }
                             printWriter.println("Noise level = " + db);
