@@ -24,7 +24,7 @@ public class SendToServer implements Runnable {
     @Override
     public void run() {
         try {
-            socket = new Socket("10.212.109.228", 3000);
+            socket = new Socket("10.188.107.225", 3000);
             String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             sendToServer("Started app at " + currentDateTimeString);
 
@@ -91,12 +91,33 @@ public class SendToServer implements Runnable {
         thread.start();
 
     }
+    public void askServerToCalculateKmeans() {
+        final String message = "Apply Kmeans Algo" + "\n";
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    OutputStream outputStream = socket.getOutputStream();
+                    outputStream.write(message.getBytes());
+                } catch (IOException e) {
+                    String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
+                    Log.e("Socket", "Couldn't send data. " + message + currentDateTimeString);
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+
+    }
 
     public DataOfLastDay getDataRecieved() {
         while (dataRecieved == null){
             Log.d("status", "waiting for Recieving data ");
         }
         return dataRecieved;
+    }
+    public void flushData(){
+        dataRecieved = null;
     }
 
     public static Socket getSocket() {

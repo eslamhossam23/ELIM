@@ -24,6 +24,31 @@
         android:layout_height="match_parent"
         android:layout_toEndOf="@+id/chartButton"
         android:layout_below="@+id/chartButton"
+        android:layout_above="@+id/kmeansButton"
         android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="screenshot"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/screenshotButton"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:text="Show Map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/showMapButton"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:text="Kmeans"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/kmeansButton"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

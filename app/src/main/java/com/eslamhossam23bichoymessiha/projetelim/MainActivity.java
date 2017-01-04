@@ -1,17 +1,20 @@
 package com.eslamhossam23bichoymessiha.projetelim;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.MediaRecorder;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -25,6 +28,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
@@ -34,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     public static String level;
     public static SaveAudio saveAudio;
     //Interval of time in milliseconds between two successive recordings
-    public static final int PERIOD = 10000;
+    public static final int PERIOD = 30000;
     //Delay before start of first recording
     public static final int DELAY = 1000;
     //Data separator
@@ -59,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         recievingSocket = new ReceiveFromServer();
         recievingThread = new Thread(recievingSocket);
         Timer timer = new Timer();
-        SaveAudio saveAudio = new SaveAudio();
+        final SaveAudio saveAudio = new SaveAudio();
         timer.schedule(saveAudio, DELAY, PERIOD);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         LocationListener locationListener = new LocationListener() {
@@ -107,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
                 // Perform action on click
                 socket.askServerForData();
                 DataOfLastDay dataRecieved = socket.getDataRecieved();
-                // Bug: second time the button is pressed, it sends the previous version of data, doesn't wait till the other version is ready.
                 Log.d("object", dataRecieved.toString());
 
                 chart = (LineChart) findViewById(R.id.chart);
@@ -130,9 +133,47 @@ public class MainActivity extends AppCompatActivity {
                 XAxis xAxis = chart.getXAxis();
                 xAxis.setValueFormatter(new TimeFormatter());
                 chart.invalidate();
+
+                //delete previous data
+                socket.flushData();
             }
         });
 
+        final Button screenshotButton = (Button) findViewById(R.id.screenshotButton);
+        screenshotButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                Calendar c = Calendar.getInstance();
+                c.setTime(new Date(System.currentTimeMillis()));
+                String dayOfMonth = c.get(Calendar.DAY_OF_MONTH) + "";
+                String dayOfWeek = c.get(Calendar.DAY_OF_WEEK) + "";
+                String month = c.get(Calendar.MONTH) + "";
+
+                if (chart != null) {
+                    chart.saveToGallery("IMG " + dayOfWeek + " " + dayOfMonth + " " + month, 100);
+                } else {
+                    Toast.makeText(MainActivity.this, " Please Get Data First", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        final Button showMapButton = (Button) findViewById(R.id.showMapButton);
+        showMapButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+               // saveAudio.stopRecording();
+                startActivity(intent);
+            }
+        });
+
+        final Button kmeansButton = (Button) findViewById(R.id.kmeansButton);
+        kmeansButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, KmeansActivity.class);
+                // saveAudio.stopRecording();
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -142,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
 
     public class SaveAudio extends TimerTask {
         public MediaRecorder mediaRecorder;
-        public static final int SECONDS = PERIOD / 1000;
+        public static final int SECONDS = PERIOD / 6000;
 
         @Override
         public void run() {
