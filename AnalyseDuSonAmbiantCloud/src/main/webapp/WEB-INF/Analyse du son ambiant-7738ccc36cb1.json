@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "analyse-du-son-ambiant",
+  "private_key_id": "7738ccc36cb116198e69abfb870ca8e277ff162a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCmX9qJ4w7q4yp2\nm7LP67x01Dg4zavnTyyv00uQ5PhuN+ZQUFV4NR6+tCT0knT/ZvFFsMT+lHcORXVi\nI6lVrMsPIc/q7t1Pge0oPe7R7Ugf5gMaN+IrJ6kSa0DHONVk5t7GbHMwss7DU47x\n/yTh85O0S/6vciNzSMO6l0bd5r5Xj8ATSPT9XpfDy+NiriCuD/eq36ZfAFSY7juX\nWFWC/uq597M24q/Bp7RkFkuPtyXhTNNsRiACmRFPSEf1XGzKWfp5vNBGm0mxRgD4\n0OExfeEKV88HCiJTAqbdbxcwVdOL1eyPwCgTFk5dQLnbloqqMt5ky3f3ZZPhOOEB\n1+BNpa9RAgMBAAECggEAWXI7Kdqa0Ilk8PNwRPx2C1F1EITyoJ8eZUDx5WpUbd07\nw34NFV1ptBlhrON4Zz9PA6qvnjbvcwrAuwx1I4yMdww0nhfhf7dYa0Qwu0gYeJ3O\nmS/mNlFSQobLAtB5WZANwRvZKhtXsgegWFZV2+x6QnqA6I4ypO4/3HcsMGy3dJcE\nHJ5ir/9XYL3in2HjrTlis0MNj6p9WxgkfLc+UiRBWbKgSCuv7HXtIkFVhyJ8PLpj\nnxxczu5s5Rlys7rtUCRrcctcfBNHApc1cZPpQygdhtZJqWy1fG7ThxG2nemcqU2h\n+13K6r5ITczAQtTKuySDRBZ9VuQU/YNAuRTeld6GgQKBgQDWAxw+6k2txJ6AWrKO\nDU+dvdmlbqRUgVi0SqnbTuaQOxzBFko/uyT1ZF2R93Dodc8avgNhWPL9C1o7PFUj\nb5zLt2zHHmbdYVMcvji8nul0BlOo72iDYDd9WGy63J7sjfCy6h0j5AWaEYkapCD1\n1F5EVL3CaEufDedmQ2cy9VhG+QKBgQDHBBwmhAwyJQl4RFP1rjbbBK6xY4GHEB5c\nAROYDjUhIDZZPIojU9kYP+OQr3sf0znxv8zd0rwRA4YuOUGjG3TkUCIodjnG/UNw\nXTo0pq5nLoHmau/wSXijd85A1ha0KzPFz1CE+M+NZQJBPrek9zM6OUB8dHvp23CI\nCahg48gJGQKBgQDL7MrNaJX8Lo6Z39KkaSqkNHNfn74Wh+nuYfbYcqZgaPNNSeAW\nOk1NRwWiQRXla9ycrtKpwAhJ9rdUGnlF+uR9eZq9YcrCyCpaCSgnE4WAeUbegsIj\n7VrypX91zyPgZKAm285IlM6BsJPkPuDpXiM1GUp4JMlqFeWZHEEJ3Z7wgQKBgQDF\ncKRk6bgXv3rHoDITmQS/AMQ3JFsKnckgycign+fBt21z1oXNSpAkaK3hitaB2lKw\nLfKXV0xRLMff79nYcZLkN0PMFI55hiVzwmnOdlar8w3YhNsJ7joLIv6ygDMCB6JT\narudUCLJSh6UkB4tQTnHV6lMT1vnxFa9/6bWiOSZcQKBgQDNl/cBPjJxUHoZAQ1A\nYy3cBn5/xGdRI8euPKPaS39I1F+l7b0Qr8lXMJSUZx/iCZghiESkJZ0rq6AhxB2J\nGkEzB7HCLj17R7LldvbiAySaZXQBBSMq7sMUcOjqPoOHwVkaTE8GbR8azTiYLluY\nuhutEM7l36mYkUM64q4/rLRwPA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "analyse@analyse-du-son-ambiant.iam.gserviceaccount.com",
+  "client_id": "106848086900444000883",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://accounts.google.com/o/oauth2/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/analyse%40analyse-du-son-ambiant.iam.gserviceaccount.com"
+}
