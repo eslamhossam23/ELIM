@@ -1,6 +1,7 @@
 package com.eslamhossam23bichoymessiha.projetelim.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,12 +11,23 @@ import android.widget.Button;
 import com.eslamhossam23bichoymessiha.projetelim.R;
 import com.eslamhossam23bichoymessiha.projetelim.models.DataOfLastDay;
 import com.eslamhossam23bichoymessiha.projetelim.models.LocationdBTriple;
+import com.eslamhossam23bichoymessiha.projetelim.models.TimedBCouple;
+import com.eslamhossam23bichoymessiha.projetelim.util.Dao;
+import com.eslamhossam23bichoymessiha.projetelim.util.TimeFormatter;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -29,21 +41,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
         final Button mapButton = (Button) findViewById(R.id.mapButton);
         mapButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Perform action on click
-//                MainActivity.socket.askServerForData();
-//                DataOfLastDay dataRecieved = MainActivity.socket.getDataRecieved();
-//                Log.d("object", dataRecieved.toString());
-//                mMap.clear();
-//                for (LocationdBTriple triple : dataRecieved.getMapLocationdB()) {
-//                    mMap.addMarker(new MarkerOptions().title(triple.getdB()+"")
-//                                    .position(new LatLng(triple.getLatitude(), triple.getLongitude())));
-//                }
-//                //delete previous data
-//                MainActivity.socket.flushDataOfLastDay();
+                Dao.askServerForData(Dao.MAP_LOCATIONDB);
+                final Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (Dao.getDataRecieved() == null) {
+                            Log.d("status", "waiting for Recieving data ");
+                            try {
+                                Thread.sleep(10);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        Log.d("Mock: Data of last day", "Value is: " + Dao.getDataRecieved());
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mMap.clear();
+                                for (LocationdBTriple triple : Dao.getDataRecieved().getMapLocationdB()) {
+                                    mMap.addMarker(new MarkerOptions().title(triple.getdB() + "")
+                                            .position(new LatLng(triple.getLatitude(), triple.getLongitude())));
+                                }
+                                Dao.flushDataOfLastDay();
+                            }
+                        });
+                        //delete previous data
+                    }
+                });
+                thread.start();
             }
         });
     }

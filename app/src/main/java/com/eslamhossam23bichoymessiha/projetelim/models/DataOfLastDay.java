@@ -12,7 +12,7 @@ import java.util.ArrayList;
  *
  * @author bichoymessiha
  */
-public class DataOfLastDay implements Serializable {
+public class DataOfLastDay {
 
     private ArrayList<TimedBCouple> chartTimedB = new ArrayList<>();
     private ArrayList<LocationdBTriple> mapLocationdB = new ArrayList<>();
@@ -21,6 +21,11 @@ public class DataOfLastDay implements Serializable {
     private float maximumdB;
 
     public DataOfLastDay() {
+    }
+
+    public DataOfLastDay(ArrayList<TimedBCouple> chartTimedB,ArrayList<LocationdBTriple> mapLocationdB) {
+        this.chartTimedB = chartTimedB;
+        this.mapLocationdB = mapLocationdB;
     }
 
     public ArrayList<TimedBCouple> getChartTimedB() {

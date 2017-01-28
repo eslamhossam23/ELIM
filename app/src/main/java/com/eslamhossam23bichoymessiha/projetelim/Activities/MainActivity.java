@@ -7,28 +7,23 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.MediaRecorder;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.eslamhossam23bichoymessiha.projetelim.R;
-import com.eslamhossam23bichoymessiha.projetelim.util.ChartAsyncTask;
+import com.eslamhossam23bichoymessiha.projetelim.models.TimedBCouple;
 import com.eslamhossam23bichoymessiha.projetelim.util.Dao;
 import com.eslamhossam23bichoymessiha.projetelim.util.TimeFormatter;
-import com.eslamhossam23bichoymessiha.projetelim.models.DataOfLastDay;
-import com.eslamhossam23bichoymessiha.projetelim.models.TimedBCouple;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -56,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
     public static LocationManager locationManager;
     public static Location location;
     public LineChart chart;
-    public Dao dao = new Dao();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,36 +102,49 @@ public class MainActivity extends AppCompatActivity {
         final Button chartButton = (Button) findViewById(R.id.chartButton);
         chartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Perform action on click
-//                dao.askServerForData();
-
-//                DataOfLastDay dataRecieved = dao.getDataRecieved();
-//                Log.d("object", dataRecieved.toString());
-//
+                Dao.askServerForData(Dao.CHART_TIMEDB);
                 chart = (LineChart) findViewById(R.id.chart);
-                new ChartAsyncTask().execute(chart);
-////                LineChart.
-//
-//                List<Entry> timedBEntries = new ArrayList<Entry>();
-//                for (TimedBCouple couple : dataRecieved.getChartTimedB()) {
-//                    timedBEntries.add(new Entry(couple.getTime(), couple.getdB()));
-//                }
-//                LineDataSet dataSet = new LineDataSet(timedBEntries, "Data Of Last Day"); // add entries to dataset
-//                dataSet.setColor(Color.BLUE);
-//                dataSet.setValueTextColor(Color.BLACK);
-//                dataSet.setDrawFilled(true);
-//                dataSet.setFillColor(Color.CYAN);
-//                dataSet.setFillAlpha(150);
-//                dataSet.setDrawCircles(false);
-//
-//                LineData lineData = new LineData(dataSet);
-//                chart.setData(lineData);
-//                XAxis xAxis = chart.getXAxis();
-//                xAxis.setValueFormatter(new TimeFormatter());
-//                chart.invalidate();
-//
-//                //delete previous data
-                dao.flushDataOfLastDay();
+                final Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        while (Dao.getDataRecieved() == null) {
+                            Log.d("status", "waiting for Recieving data ");
+                            try {
+                                Thread.sleep(10);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        Log.d("Mock: Data of last day", "Value is: " + Dao.getDataRecieved());
+
+                        final List<Entry> timedBEntries = new ArrayList<Entry>();
+                        for (TimedBCouple couple : Dao.getDataRecieved().getChartTimedB()) {
+                            timedBEntries.add(new Entry(couple.getTime(), couple.getdB()));
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                LineDataSet dataSet = new LineDataSet(timedBEntries, "Data Of Last Day"); // add entries to dataset
+                                dataSet.setColor(Color.BLUE);
+                                dataSet.setValueTextColor(Color.BLACK);
+                                dataSet.setDrawFilled(true);
+                                dataSet.setFillColor(Color.CYAN);
+                                dataSet.setFillAlpha(150);
+                                dataSet.setDrawCircles(false);
+                                LineData lineData = new LineData(dataSet);
+
+                                chart.setData(lineData);
+                                XAxis xAxis = chart.getXAxis();
+                                xAxis.setValueFormatter(new TimeFormatter());
+                                chart.invalidate();
+                                Dao.flushDataOfLastDay();
+                            }
+                        });
+                        //delete previous data
+                    }
+                });
+                thread.start();
             }
         });
 
@@ -219,10 +226,10 @@ public class MainActivity extends AppCompatActivity {
                         if (printWriter != null) {
                             printWriter.println(time[3]);
                             if (location != null) {
-                                dao.insertData(System.currentTimeMillis(), db, location.getLatitude(), location.getLongitude());
+                                Dao.insertData(System.currentTimeMillis(), db, location.getLatitude(), location.getLongitude());
                                 printWriter.println("Lat: " + location.getLatitude() + " Long: " + location.getLongitude());
                             } else {
-                                dao.insertData(System.currentTimeMillis(), db, 0, 0);
+                                Dao.insertData(System.currentTimeMillis(), db, 0, 0);
                             }
                             printWriter.println("Noise level = " + db);
                             printWriter.println();

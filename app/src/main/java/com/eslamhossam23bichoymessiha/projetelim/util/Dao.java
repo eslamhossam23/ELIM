@@ -22,44 +22,54 @@ import java.util.HashMap;
 
 public class Dao {
 
-    FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DataOfLastDay dataOfLastDay = null;
-    DatabaseReference myRef;
-    public Dao() {
+    public static final String CHART_TIMEDB = "/chartTimedB";
+    public static final String MAP_LOCATIONDB = "/mapLocationdB";
+    public static FirebaseDatabase database = FirebaseDatabase.getInstance();
+    public static DataOfLastDay dataOfLastDay = null;
 
-    }
-
-
-    public void insertData(long time, float db, double lat, double lng) {
+    public static void insertData(long time, float db, double lat, double lng) {
         // Write a message to the database
         Calendar c = Calendar.getInstance();
         c.setTime(new Date(time));
         //DD/MM/YYYY
         String day = c.get(Calendar.DAY_OF_MONTH) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.get(Calendar.YEAR);
-        myRef = database.getReference(day);
+        DatabaseReference myRef = database.getReference(day);
         TimedBCouple couple = new TimedBCouple(time, db);
         myRef.child("chartTimedB").push().setValue(couple);
         LocationdBTriple triple = new LocationdBTriple(lat, lng, db);
         myRef.child("mapLocationdB").push().setValue(triple);
-        Log.d("TEST", "insertData: " + myRef.toString()+".json");
+        Log.d("TEST", "insertData: " + myRef.toString() + ".json");
     }
 
-    public void askServerForData() {
+    public static void askServerForData(final String type) {
         Calendar c = Calendar.getInstance();
         c.setTime(new Date(System.currentTimeMillis()));
-//        DD/MM/YYYY
+//      DD-MM-YYYY
         String day = c.get(Calendar.DAY_OF_MONTH) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.get(Calendar.YEAR);
-
-        myRef = database.getReference(day);
-        Log.d("TEST", "askServerForData: " + myRef.toString()+".json");
-
-
-        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference chartRef = database.getReference(day + type);
+        chartRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                HashMap<String, String> value = (HashMap<String, String>) dataSnapshot.getValue();
-                Log.d("", "Value is: " + value);
-                dataOfLastDay = new DataOfLastDay();
+                switch (type) {
+                    case CHART_TIMEDB:
+                        ArrayList<TimedBCouple> chartTimedB = new ArrayList<>();
+                        for (DataSnapshot data : dataSnapshot.getChildren()) {
+                            chartTimedB.add(data.getValue(TimedBCouple.class));
+                        }
+                        dataOfLastDay = new DataOfLastDay(chartTimedB, null);
+                        break;
+                    case MAP_LOCATIONDB:
+                        ArrayList<LocationdBTriple> mapLocationdB = new ArrayList<>();
+                        for (DataSnapshot data : dataSnapshot.getChildren()) {
+                            mapLocationdB.add(data.getValue(LocationdBTriple.class));
+                        }
+                        dataOfLastDay = new DataOfLastDay(null,mapLocationdB);
+                        break;
+                }
+
+
+                Log.d("Mock: Data of last day", "Value is: " + dataOfLastDay);
+
             }
 
             @Override
@@ -70,13 +80,11 @@ public class Dao {
         });
     }
 
-    public DataOfLastDay getDataRecieved() {
-        while (dataOfLastDay == null){
-            Log.d("status", "waiting for Recieving data ");
-        }
+    public static DataOfLastDay getDataRecieved() {
         return dataOfLastDay;
     }
-    public void flushDataOfLastDay(){
+
+    public static void flushDataOfLastDay() {
         dataOfLastDay = null;
     }
 
