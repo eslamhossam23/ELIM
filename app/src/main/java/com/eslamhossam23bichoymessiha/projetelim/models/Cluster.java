@@ -1,4 +1,4 @@
-package com.eslamhossam23bichoymessiha.projetelim;
+package com.eslamhossam23bichoymessiha.projetelim.models;
 
 /**
  * Created by bichoymessiha on 04-Jan-17.

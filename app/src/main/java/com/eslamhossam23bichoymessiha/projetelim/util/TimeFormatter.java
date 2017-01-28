@@ -1,4 +1,4 @@
-package com.eslamhossam23bichoymessiha.projetelim;
+package com.eslamhossam23bichoymessiha.projetelim.util;
 
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
@@ -19,7 +19,7 @@ public class TimeFormatter implements IAxisValueFormatter {
 //        return mValues[(int) value];
         Calendar c = Calendar.getInstance();
         c.setTime(new Date((long) value));
-        String hour = c.get(Calendar.HOUR) + "";
+        String hour = c.get(Calendar.HOUR_OF_DAY) + "";
         String minute = c.get(Calendar.MINUTE) + "";
         return hour + "h" + minute;
     }

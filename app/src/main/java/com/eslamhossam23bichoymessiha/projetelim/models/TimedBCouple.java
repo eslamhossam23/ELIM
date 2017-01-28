@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.eslamhossam23bichoymessiha.projetelim;
+package com.eslamhossam23bichoymessiha.projetelim.models;
 
 import java.io.Serializable;
 
@@ -12,8 +12,11 @@ import java.io.Serializable;
  * @author bichoymessiha
  */
 public class TimedBCouple implements Serializable{
-    private long time;
-    private float dB;
+    public long time;
+    public float dB;
+
+    public TimedBCouple() {
+    }
 
     public TimedBCouple(long time, float dB) {
         this.time = time;

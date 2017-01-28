@@ -1,4 +1,4 @@
-package com.eslamhossam23bichoymessiha.projetelim;
+package com.eslamhossam23bichoymessiha.projetelim.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,7 +8,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.MediaRecorder;
 import android.os.Environment;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,11 +15,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.eslamhossam23bichoymessiha.projetelim.R;
+import com.eslamhossam23bichoymessiha.projetelim.util.ChartAsyncTask;
+import com.eslamhossam23bichoymessiha.projetelim.util.Dao;
+import com.eslamhossam23bichoymessiha.projetelim.util.TimeFormatter;
+import com.eslamhossam23bichoymessiha.projetelim.models.DataOfLastDay;
+import com.eslamhossam23bichoymessiha.projetelim.models.TimedBCouple;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -42,27 +50,19 @@ public class MainActivity extends AppCompatActivity {
     //Delay before start of first recording
     public static final int DELAY = 1000;
     //Data separator
-    private static final String SEPARATOR = "-";
+//    private static final String SEPARATOR = "-";
     //Unknown GPS
     public static final String UNKNOWN = "UNKNOWN";
     public static LocationManager locationManager;
     public static Location location;
-    public static SendToServer socket;
-    public static Thread networkThread;
-    public static Thread recievingThread;
-    public static ReceiveFromServer recievingSocket;
     public LineChart chart;
+    public Dao dao = new Dao();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        socket = new SendToServer();
-        networkThread = new Thread(socket);
-        networkThread.start();
-        recievingSocket = new ReceiveFromServer();
-        recievingThread = new Thread(recievingSocket);
-        Timer timer = new Timer();
+        final Timer timer = new Timer();
         final SaveAudio saveAudio = new SaveAudio();
         timer.schedule(saveAudio, DELAY, PERIOD);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -109,33 +109,35 @@ public class MainActivity extends AppCompatActivity {
         chartButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
-                socket.askServerForData();
-                DataOfLastDay dataRecieved = socket.getDataRecieved();
-                Log.d("object", dataRecieved.toString());
+//                dao.askServerForData();
 
+//                DataOfLastDay dataRecieved = dao.getDataRecieved();
+//                Log.d("object", dataRecieved.toString());
+//
                 chart = (LineChart) findViewById(R.id.chart);
-//                LineChart.
-
-                List<Entry> timedBEntries = new ArrayList<Entry>();
-                for (TimedBCouple couple : dataRecieved.getChartTimedB()) {
-                    timedBEntries.add(new Entry(couple.getTime(), couple.getdB()));
-                }
-                LineDataSet dataSet = new LineDataSet(timedBEntries, "Data Of Last Day"); // add entries to dataset
-                dataSet.setColor(Color.BLUE);
-                dataSet.setValueTextColor(Color.BLACK);
-                dataSet.setDrawFilled(true);
-                dataSet.setFillColor(Color.CYAN);
-                dataSet.setFillAlpha(150);
-                dataSet.setDrawCircles(false);
-
-                LineData lineData = new LineData(dataSet);
-                chart.setData(lineData);
-                XAxis xAxis = chart.getXAxis();
-                xAxis.setValueFormatter(new TimeFormatter());
-                chart.invalidate();
-
-                //delete previous data
-                socket.flushData();
+                new ChartAsyncTask().execute(chart);
+////                LineChart.
+//
+//                List<Entry> timedBEntries = new ArrayList<Entry>();
+//                for (TimedBCouple couple : dataRecieved.getChartTimedB()) {
+//                    timedBEntries.add(new Entry(couple.getTime(), couple.getdB()));
+//                }
+//                LineDataSet dataSet = new LineDataSet(timedBEntries, "Data Of Last Day"); // add entries to dataset
+//                dataSet.setColor(Color.BLUE);
+//                dataSet.setValueTextColor(Color.BLACK);
+//                dataSet.setDrawFilled(true);
+//                dataSet.setFillColor(Color.CYAN);
+//                dataSet.setFillAlpha(150);
+//                dataSet.setDrawCircles(false);
+//
+//                LineData lineData = new LineData(dataSet);
+//                chart.setData(lineData);
+//                XAxis xAxis = chart.getXAxis();
+//                xAxis.setValueFormatter(new TimeFormatter());
+//                chart.invalidate();
+//
+//                //delete previous data
+                dao.flushDataOfLastDay();
             }
         });
 
@@ -161,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         showMapButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, MapsActivity.class);
-               // saveAudio.stopRecording();
+                // saveAudio.stopRecording();
                 startActivity(intent);
             }
         });
@@ -195,10 +197,8 @@ public class MainActivity extends AppCompatActivity {
             try {
                 fileWriter = new FileWriter(file, true);
                 printWriter = new PrintWriter(fileWriter);
-                while (socket.getSocket() == null) {
+//                socket.sendToServer("Began recording at " + currentDateTimeString);
 
-                }
-                socket.sendToServer("Began recording at " + currentDateTimeString);
                 printWriter.println("Began recording at " + currentDateTimeString);
                 printWriter.println();
                 printWriter.flush();
@@ -219,10 +219,10 @@ public class MainActivity extends AppCompatActivity {
                         if (printWriter != null) {
                             printWriter.println(time[3]);
                             if (location != null) {
-                                socket.sendToServer(System.currentTimeMillis() + SEPARATOR + location.getLatitude() + SEPARATOR + location.getLongitude() + SEPARATOR + db);
+                                dao.insertData(System.currentTimeMillis(), db, location.getLatitude(), location.getLongitude());
                                 printWriter.println("Lat: " + location.getLatitude() + " Long: " + location.getLongitude());
                             } else {
-                                socket.sendToServer(System.currentTimeMillis() + SEPARATOR + UNKNOWN + SEPARATOR + UNKNOWN + SEPARATOR + db);
+                                dao.insertData(System.currentTimeMillis(), db, 0, 0);
                             }
                             printWriter.println("Noise level = " + db);
                             printWriter.println();
@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
             }
             currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
             if (printWriter != null) {
-                socket.sendToServer("Stopped recording at " + currentDateTimeString);
+//                socket.sendToServer("Stopped recording at " + currentDateTimeString);
                 printWriter.println("Stopped recording at " + currentDateTimeString);
                 printWriter.println();
                 printWriter.flush();
@@ -272,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 mediaRecorder.prepare();
                 mediaRecorder.start();
-            } catch (IOException e) {
+            } catch (IOException | IllegalStateException e) {
                 e.printStackTrace();
             }
         }

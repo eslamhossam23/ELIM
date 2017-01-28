@@ -1,8 +1,7 @@
-package com.eslamhossam23bichoymessiha.projetelim;
+package com.eslamhossam23bichoymessiha.projetelim.models;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /*
  * To change this license header, choose License Headers in Project Properties.

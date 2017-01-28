@@ -1,28 +1,21 @@
-package com.eslamhossam23bichoymessiha.projetelim;
+package com.eslamhossam23bichoymessiha.projetelim.activities;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
+import com.eslamhossam23bichoymessiha.projetelim.R;
+import com.eslamhossam23bichoymessiha.projetelim.models.DataOfLastDay;
+import com.eslamhossam23bichoymessiha.projetelim.models.LocationdBTriple;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -41,16 +34,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // Perform action on click
-                MainActivity.socket.askServerForData();
-                DataOfLastDay dataRecieved = MainActivity.socket.getDataRecieved();
-                Log.d("object", dataRecieved.toString());
-                mMap.clear();
-                for (LocationdBTriple triple : dataRecieved.getMapLocationdB()) {
-                    mMap.addMarker(new MarkerOptions().title(triple.getdB()+"")
-                                    .position(new LatLng(triple.getLatitude(), triple.getLongitude())));
-                }
-                //delete previous data
-                MainActivity.socket.flushData();
+//                MainActivity.socket.askServerForData();
+//                DataOfLastDay dataRecieved = MainActivity.socket.getDataRecieved();
+//                Log.d("object", dataRecieved.toString());
+//                mMap.clear();
+//                for (LocationdBTriple triple : dataRecieved.getMapLocationdB()) {
+//                    mMap.addMarker(new MarkerOptions().title(triple.getdB()+"")
+//                                    .position(new LatLng(triple.getLatitude(), triple.getLongitude())));
+//                }
+//                //delete previous data
+//                MainActivity.socket.flushDataOfLastDay();
             }
         });
     }
