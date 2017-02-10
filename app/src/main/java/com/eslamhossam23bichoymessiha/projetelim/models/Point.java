@@ -14,6 +14,9 @@ public class Point implements Serializable {
     private double dB = 0;
     private int cluster_number = 0;
 
+    public Point() {
+    }
+
     public Point(double time, double dB) {
         this.setTime(time);
         this.setdB(dB);

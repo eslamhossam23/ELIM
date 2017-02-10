@@ -32,12 +32,17 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="AIzaSyBvz2ZE6V7F-yroNzhXxENrbkaTVNPljIw" />
 
         <activity
             android:name=".activities.MapsActivity"
             android:label="@string/title_activity_maps" />
         <activity android:name=".activities.KmeansActivity" />
+
+        <service
+            android:name=".services.RecordingService"
+            android:enabled="true"
+            android:exported="true"/>
     </application>
 
 </manifest>

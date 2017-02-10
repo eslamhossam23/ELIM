@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1066114732749",
+    "firebase_url": "https://analyse-du-son-ambiant.firebaseio.com",
+    "project_id": "analyse-du-son-ambiant",
+    "storage_bucket": "analyse-du-son-ambiant.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1066114732749:android:3a17b9500e5e4d39",
+        "android_client_info": {
+          "package_name": "com.eslamhossam23bichoymessiha.projetelim"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1066114732749-iv77hnahi9joslk3org0ha9bhc78irf4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.eslamhossam23bichoymessiha.projetelim",
+            "certificate_hash": "5B41D2274D2801FDE8014D5799ECF09325D35896"
+          }
+        },
+        {
+          "client_id": "1066114732749-cqpoas36f72djmlfbom54b3uau3mb732.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvz2ZE6V7F-yroNzhXxENrbkaTVNPljIw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1066114732749-cqpoas36f72djmlfbom54b3uau3mb732.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

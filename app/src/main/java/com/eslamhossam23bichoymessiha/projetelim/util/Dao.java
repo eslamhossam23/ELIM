@@ -2,6 +2,7 @@ package com.eslamhossam23bichoymessiha.projetelim.util;
 
 import android.util.Log;
 
+import com.eslamhossam23bichoymessiha.projetelim.models.Cluster;
 import com.eslamhossam23bichoymessiha.projetelim.models.DataOfLastDay;
 import com.eslamhossam23bichoymessiha.projetelim.models.LocationdBTriple;
 import com.eslamhossam23bichoymessiha.projetelim.models.TimedBCouple;
@@ -24,6 +25,7 @@ public class Dao {
 
     public static final String CHART_TIMEDB = "/chartTimedB";
     public static final String MAP_LOCATIONDB = "/mapLocationdB";
+    public static final String CLUSTERS_TIMEDB = "/clustersTimeDb";
     public static FirebaseDatabase database = FirebaseDatabase.getInstance();
     public static DataOfLastDay dataOfLastDay = null;
 
@@ -41,7 +43,7 @@ public class Dao {
         Log.d("TEST", "insertData: " + myRef.toString() + ".json");
     }
 
-    public static void askServerForData(final String type) {
+    public static void askFirebaseForData(final String type) {
         Calendar c = Calendar.getInstance();
         c.setTime(new Date(System.currentTimeMillis()));
 //      DD-MM-YYYY
@@ -56,14 +58,21 @@ public class Dao {
                         for (DataSnapshot data : dataSnapshot.getChildren()) {
                             chartTimedB.add(data.getValue(TimedBCouple.class));
                         }
-                        dataOfLastDay = new DataOfLastDay(chartTimedB, null);
+                        dataOfLastDay = new DataOfLastDay(chartTimedB, null, null);
                         break;
                     case MAP_LOCATIONDB:
                         ArrayList<LocationdBTriple> mapLocationdB = new ArrayList<>();
                         for (DataSnapshot data : dataSnapshot.getChildren()) {
                             mapLocationdB.add(data.getValue(LocationdBTriple.class));
                         }
-                        dataOfLastDay = new DataOfLastDay(null,mapLocationdB);
+                        dataOfLastDay = new DataOfLastDay(null, mapLocationdB, null);
+                        break;
+                    case CLUSTERS_TIMEDB:
+                        ArrayList<Cluster> kmeansClusters = new ArrayList<>();
+                        for (DataSnapshot data : dataSnapshot.getChildren()) {
+                            kmeansClusters.add(data.getValue(Cluster.class));
+                        }
+                        dataOfLastDay = new DataOfLastDay(null, null, kmeansClusters);
                         break;
                 }
 

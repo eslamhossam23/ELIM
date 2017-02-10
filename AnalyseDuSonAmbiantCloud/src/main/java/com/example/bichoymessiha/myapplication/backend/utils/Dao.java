@@ -5,6 +5,7 @@ import com.example.bichoymessiha.myapplication.backend.models.Cluster;
 import com.example.bichoymessiha.myapplication.backend.models.DataOfLastDay;
 import com.example.bichoymessiha.myapplication.backend.models.LocationdBTriple;
 import com.example.bichoymessiha.myapplication.backend.models.TimedBCouple;
+import com.google.appengine.repackaged.com.google.gson.Gson;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -63,12 +64,8 @@ public class Dao {
                         dataOfLastDay = new DataOfLastDay(null, mapLocationdB);
                         break;
                 }
-                KMeans kmeans = new KMeans();
-                kmeans.init(Dao.getDataRecieved().getChartTimedB());
-                Dao.setKmeansClusters(kmeans.calculate());
-                //Delete Data received
-                Dao.flushDataOfLastDay();
             }
+
             @Override
             public void onCancelled(DatabaseError error) {
                 // Failed to read value
@@ -77,20 +74,21 @@ public class Dao {
         });
     }
 
+    public static ArrayList<Cluster> getClustersList() {
+        KMeans kmeans = new KMeans();
+        kmeans.init(Dao.getDataRecieved().getChartTimedB());
+        return kmeans.calculate();
+    }
+
+    public static ArrayList<LocationdBTriple> getMapLocationdBWithNoRedundancy(){
+        return LocationOptimizer.removeRedundancy(dataOfLastDay.getMapLocationdB());
+    }
+
     public static DataOfLastDay getDataRecieved() {
         return dataOfLastDay;
     }
 
     public static void flushDataOfLastDay() {
         dataOfLastDay = null;
-    }
-
-    public static void setKmeansClusters(ArrayList<Cluster> clusters) {
-        Calendar c = Calendar.getInstance();
-        c.setTime(new Date(System.currentTimeMillis()));
-//      DD-MM-YYYY
-        String day = c.get(Calendar.DAY_OF_MONTH) + "-" + (c.get(Calendar.MONTH) + 1) + "-" + c.get(Calendar.YEAR);
-        DatabaseReference clustersRef = database.getReference(day + CLUSTERS_TIMEDB);
-        clustersRef.setValue(clusters);
     }
 }

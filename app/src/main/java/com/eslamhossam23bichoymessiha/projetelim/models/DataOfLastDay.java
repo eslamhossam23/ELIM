@@ -23,9 +23,10 @@ public class DataOfLastDay {
     public DataOfLastDay() {
     }
 
-    public DataOfLastDay(ArrayList<TimedBCouple> chartTimedB,ArrayList<LocationdBTriple> mapLocationdB) {
+    public DataOfLastDay(ArrayList<TimedBCouple> chartTimedB, ArrayList<LocationdBTriple> mapLocationdB, ArrayList<Cluster> kmeansClusters) {
         this.chartTimedB = chartTimedB;
         this.mapLocationdB = mapLocationdB;
+        this.kmeansClusters = kmeansClusters;
     }
 
     public ArrayList<TimedBCouple> getChartTimedB() {
