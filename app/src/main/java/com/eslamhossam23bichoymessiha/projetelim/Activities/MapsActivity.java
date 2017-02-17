@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.eslamhossam23bichoymessiha.projetelim.R;
 import com.eslamhossam23bichoymessiha.projetelim.models.Cluster;
 import com.eslamhossam23bichoymessiha.projetelim.models.LocationdBTriple;
+import com.eslamhossam23bichoymessiha.projetelim.services.RecordingService;
 import com.eslamhossam23bichoymessiha.projetelim.util.Dao;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -44,47 +46,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final Button mapButton = (Button) findViewById(R.id.mapButton);
         mapButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-//                Dao.askFirebaseForData(Dao.MAP_LOCATIONDB);
-                final Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-//                        while (Dao.getDataRecieved() == null) {
-//                            Log.d("status", "waiting for Recieving data ");
-//                            try {
-//                                Thread.sleep(10);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//                        Log.d("Mock: Data of last day", "Value is: " + Dao.getDataRecieved());
-
-                        try {
-                            URL url = new URL("http://analyse-du-son-ambiant.appspot.com/locations");
-                            InputStream input = url.openStream();
-                            Reader reader = new InputStreamReader(input, "UTF-8");
-                            final ArrayList<LocationdBTriple> results = new Gson().fromJson(reader, new TypeToken<ArrayList<LocationdBTriple>>() {
-                            }.getType());
-
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mMap.clear();
-                                    for (LocationdBTriple triple : results) {
-                                        mMap.addMarker(new MarkerOptions().title(triple.getdB() + "")
-                                                .position(new LatLng(triple.getLatitude(), triple.getLongitude())));
-                                    }
-                                    Dao.flushDataOfLastDay();
-                                }
-                            });
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                if(!RecordingService.NetworkChangeReceiver.connected){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(MapsActivity.this,"You must connect to the internet.",Toast.LENGTH_SHORT).show();
                         }
-                        //delete previous data
-                    }
-                });
-                thread.start();
+                    });
+
+                }else {
+                    final Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                URL url = new URL("http://analyse-du-son-ambiant.appspot.com/locations");
+                                InputStream input = url.openStream();
+                                Reader reader = new InputStreamReader(input, "UTF-8");
+                                final ArrayList<LocationdBTriple> results = new Gson().fromJson(reader, new TypeToken<ArrayList<LocationdBTriple>>() {
+                                }.getType());
+
+
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mMap.clear();
+                                        for (LocationdBTriple triple : results) {
+                                            mMap.addMarker(new MarkerOptions().title(triple.getdB() + "")
+                                                    .position(new LatLng(triple.getLatitude(), triple.getLongitude())));
+                                        }
+                                        Dao.flushDataOfLastDay();
+                                    }
+                                });
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            //delete previous data
+                        }
+                    });
+                    thread.start();
+                }
             }
         });
     }
@@ -109,12 +110,4 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLng(nice));
         mMap.moveCamera(CameraUpdateFactory.zoomTo(10));
     }
-
-
-    public void returnToChart(View v) {
-        Intent intent = new Intent(MapsActivity.this, MainActivity.class);
-        startActivity(intent);
-    }
-
-
 }

@@ -15,7 +15,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 
 /**
  * Created by bichoymessiha on 25-Jan-17.
@@ -91,6 +90,7 @@ public class Dao {
 
     public static DataOfLastDay getDataRecieved() {
         return dataOfLastDay;
+
     }
 
     public static void flushDataOfLastDay() {

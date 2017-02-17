@@ -1,36 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_kmeans"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.eslamhossam23bichoymessiha.projetelim.activities.KmeansActivity">
+    android:layout_height="match_parent">
 
-    <Button
-        android:text="Back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/returnButton" />
+    <RelativeLayout
+        android:id="@+id/activity_kmeans"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="com.eslamhossam23bichoymessiha.projetelim.activities.KmeansActivity">
 
-    <Button
-        android:text="Calculate Kmeans"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/calculateButton" />
+        <Button
+            android:id="@+id/calculateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:text="Calculate Kmeans" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/calculateButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="91dp"
-        android:id="@+id/result" />
-</RelativeLayout>
+        <com.github.mikephil.charting.charts.BarChart
+            android:id="@+id/barChart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_below="@+id/calculateButton"/>
+
+        <TextView
+            android:id="@+id/result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/barChart"
+            android:layout_centerHorizontal="true"/>
+
+        <ImageButton
+            android:src="@drawable/ic_camera_alt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/screenshotButton"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_above="@+id/barChart" />
+
+    </RelativeLayout>
+</ScrollView>

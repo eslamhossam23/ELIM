@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class KMeans {
 
 	//Number of Clusters. This metric should be related to the number of points
-    private int NUM_CLUSTERS = 4;    
+    private int NUM_CLUSTERS = 2;
     //Number of Points
     private int NUM_POINTS = 15;
     //Min and Max X and Y
